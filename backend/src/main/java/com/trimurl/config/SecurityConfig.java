@@ -36,26 +36,27 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // 1. Explicitly enable CORS and link our custom configuration source
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authz -> authz
-                        // 2. FIXED: Paths are relative to your context-path. Remove the leading /api/
-                        .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/r/**").permitAll()
-                        .requestMatchers("/auth/**").authenticated()
-                        .requestMatchers("/urls/**").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(authz -> authz
+                    // 1. Open up the public endpoints cleanly
+                    .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/r/**").permitAll()
+                    
+                    // 2. All other URL shortening metrics and custom links require a clean JWT token
+                    .requestMatchers("/urls/**").authenticated()
+                    
+                    // 3. Catch-all safety net
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
-
+    return http.build();
+}
     // 3. Define the explicit Web Security CORS filter bean rules
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
