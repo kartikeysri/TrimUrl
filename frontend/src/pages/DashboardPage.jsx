@@ -4,7 +4,7 @@ import {
   Copy, Trash2, QrCode, TrendingUp, Link2, BarChart3,
   Plus, Search, Eye, Download
 } from 'lucide-react'
-import QRCode from 'qrcode.react'
+import { QRCodeSVG } from 'qrcode.react'
 import { urlAPI } from '../services/api'
 import { copyToClipboard, isValidUrl, formatDate } from '../utils/helpers'
 import { Card } from '../components/Common'
@@ -370,32 +370,31 @@ export const DashboardPage = () => {
         </div>
       </div>
 
-      {/* QR Code Modal */}
-      {selectedQR && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setSelectedQR(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            onClick={(e) => e.stopPropagation()}
-            className="glass rounded-2xl p-8 max-w-sm w-full"
-          >
-            <h3 className="text-2xl font-bold mb-6">QR Code</h3>
-            
-            <div className="bg-white p-4 rounded-lg mb-4 flex justify-center">
-              <QRCode
-                value={`${baseUrl}/r/${selectedQR.shortCode}`}
-                size={256}
-                level="H"
-                includeMargin={true}
-              />
-            </div>
-
+    {/* QR Code Modal */}
+{selectedQR && (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    onClick={() => setSelectedQR(null)}
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+  >
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      onClick={(e) => e.stopPropagation()}
+      className="glass rounded-2xl p-8 max-w-sm w-full"
+    >
+      <h3 className="text-2xl font-bold mb-6">QR Code</h3>
+      
+      <div className="bg-white p-4 rounded-lg mb-4 flex justify-center">
+        <QRCodeSVG
+          value={`${baseUrl}/r/${selectedQR.shortCode}`}
+          size={256}
+          level="H"
+          includeMargin={true}
+        />
+      </div>
             <div className="space-y-2 mb-6 text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">Short URL</p>
               <p className="text-lg font-mono text-sky-500">{baseUrl}/r/{selectedQR.shortCode}</p>
