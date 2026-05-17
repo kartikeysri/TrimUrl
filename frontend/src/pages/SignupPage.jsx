@@ -56,11 +56,26 @@ export const SignupPage = () => {
 
     try {
       const response = await authAPI.register(formData.email, formData.password)
-      const { token, user } = response.data
-      login(user, token)
+      
+      // Defensive parsing to support token, accessToken, or jwtToken naming fields
+      const data = response.data
+      const resolvedToken = data.token || data.accessToken || data.jwtToken
+      const resolvedUser = data.user || { email: formData.email }
+
+      if (!resolvedToken) {
+        throw new Error('Backend verified registration but didn\'t return an authorization token.')
+      }
+
+      // Commit user login to auth global state context
+      login(resolvedUser, resolvedToken)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.')
+      console.error("Signup network stack trace:", err)
+      setError(
+        err.response?.data?.message || 
+        err.message || 
+        'Registration failed. Please check endpoint paths or context constraints.'
+      )
     } finally {
       setLoading(false)
     }
