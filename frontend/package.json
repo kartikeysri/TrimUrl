@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "config": {
+    "legacy-peer-deps": true
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
