@@ -24,32 +24,31 @@ public class JwtProvider {
 
     public String generateToken(String email) {
         return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setSubject(email) // Fixed for 0.11.5 (.subject -> .setSubject)
+                .setIssuedAt(new Date()) // Fixed for 0.11.5 (.issuedAt -> .setIssuedAt)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // Fixed for 0.11.5 (.expiration -> .setExpiration)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-   public String getEmailFromToken(String token) {
-    Claims claims = Jwts.parser()
-            .verifyWith(getSigningKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload(); // Replaces getBody()
-            
-    return claims.getSubject();
-}
-
-   public boolean validateToken(String token) {
-    try {
-        Jwts.parser()
-                .verifyWith(getSigningKey())
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseSignedClaims(token);
-        return true;
-    } catch (Exception e) {
-        return false;
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
-}
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
