@@ -3,9 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "config": {
-    "legacy-peer-deps": true
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -19,7 +16,7 @@
     "axios": "^1.6.2",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.292.0",
-    "qrcode.react": "^1.0.1",
+    "qrcode.react": "^4.1.0", 
     "date-fns": "^2.30.0"
   },
   "devDependencies": {
