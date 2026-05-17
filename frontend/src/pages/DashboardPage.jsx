@@ -28,22 +28,35 @@ export const DashboardPage = () => {
     fetchData()
   }, [])
 
-  const fetchData = async () => {
-    try {
-      setLoading(true)
-      const [urlsRes, statsRes] = await Promise.all([
-        urlAPI.getUserUrls(),
-        urlAPI.getDashboardStats()
-      ])
-      setUrls(urlsRes.data)
-      setStats(statsRes.data)
-    } catch (err) {
-      setError('Failed to load dashboard data')
-    } finally {
-      setLoading(false)
+const fetchData = async () => {
+  try {
+    setLoading(true)
+    setError('') // Clear any previous errors
+    
+    const [urlsRes, statsRes] = await Promise.all([
+      urlAPI.getUserUrls(),
+      urlAPI.getDashboardStats()
+    ])
+    
+    // SAFE PARSING: Extract the nested array if it's wrapped in a Spring Page object
+    const incomingData = urlsRes.data
+    if (Array.isArray(incomingData)) {
+      setUrls(incomingData)
+    } else if (incomingData && Array.isArray(incomingData.content)) {
+      setUrls(incomingData.content) // Pulls the actual list out of Spring's Page wrapper
+    } else {
+      setUrls([]) // Emergency fallback to keep your components from crashing
     }
+    
+    setStats(statsRes.data)
+  } catch (err) {
+    console.error("Dashboard fetch error:", err)
+    setError('Failed to load dashboard data')
+    setUrls([]) // Defensive fallback on failure
+  } finally {
+    setLoading(false)
   }
-
+}
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
