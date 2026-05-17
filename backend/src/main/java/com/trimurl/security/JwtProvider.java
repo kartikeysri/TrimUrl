@@ -41,15 +41,15 @@ public class JwtProvider {
     return claims.getSubject();
 }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+   public boolean validateToken(String token) {
+    try {
+        Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token);
+        return true;
+    } catch (Exception e) {
+        return false;
     }
+}
 }
